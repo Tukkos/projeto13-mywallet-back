@@ -9,8 +9,22 @@ const transactionSchema = joi.object({
 });
 
 async function getTransactions (req, res) {
+    const { auth } = req.headers;
+    const token = auth?.replace("Bearer ", "");
+    if (!token) return res.sendStatus(401);
+
     try {
-        const transactions = await db.collection("transactions").find().toArray();
+        const session = await db.collection("sessions").findOne({ token });
+        if (!session) {
+            return res.sendStatus(401);
+        };
+
+        const userId = session.userId;
+        console.log(userId);
+
+        const transactions = await db.collection("transactions").find({
+            userId: userId
+        }).toArray();
         res.send(transactions);
     } catch (error) {
         res.status(500).send(error.message);
@@ -18,8 +32,11 @@ async function getTransactions (req, res) {
 };
 
 async function createIncomeTransactions (req, res) {
-    const { value, description, type, date } = req.body;
+    const { auth } = req.headers;
+    const token = auth?.replace("Bearer ", "");
+    if (!token) return res.sendStatus(401);
 
+    const { value, description, type, date } = req.body;
     const validation = transactionSchema.validate(req.body, {abortEarly: false});
     if (validation.error) {
         const error = validation.error.details.map(details => details.message);
@@ -27,12 +44,19 @@ async function createIncomeTransactions (req, res) {
     };
 
     try {
+        const session = await db.collection("sessions").findOne({ token });
+        if (!session) {
+            return res.sendStatus(401);
+        };
+
         await db.collection("transactions").insertOne({
+                userId: session.userId,
                 value,
                 description,
                 type,
                 date
         });
+
         res.sendStatus(201);
     } catch (error) {
         res.status(500).send(error.message);
@@ -40,8 +64,11 @@ async function createIncomeTransactions (req, res) {
 };
 
 async function createOutcomeTransactions (req, res) {
-    const { value, description, type, date } = req.body;
+    const { auth } = req.headers;
+    const token = auth?.replace("Bearer ", "");
+    if (!token) return res.sendStatus(401);
 
+    const { value, description, type, date } = req.body;
     const validation = transactionSchema.validate(req.body, {abortEarly: false});
     if (validation.error) {
         const error = validation.error.details.map(details => details.message);
@@ -49,7 +76,13 @@ async function createOutcomeTransactions (req, res) {
     };
 
     try {
+        const session = await db.collection("sessions").findOne({ token });
+        if (!session) {
+            return res.sendStatus(401);
+        };
+
         await db.collection("transactions").insertOne({
+                userId: session.userId,
                 value,
                 description,
                 type,

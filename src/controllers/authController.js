@@ -41,18 +41,13 @@ async function signIn(req, res) {
     const {email, password } = req.body;
     try {
         const user = await db.collection("users").findOne({ email });
-        if (!user) {
-            return res.status(409).send("Usuário não encontrado");
-        };
-
         if (user && bcrypt.compareSync(password, user.password)) {
             const token = uuid();
-    
+
             await db.collection("sessions").insertOne({ token, userId: user._id });
-    
             res.send(token);
         } else {
-            res.sendStatus(401);
+            res.status(401).send("Usuário não encontrado, login ou senha incorretos");
         };
     } catch (error) {
         res.status(500).send(error.message);
