@@ -2,6 +2,7 @@ import db from "../database/db.js"
 
 async function authorizationValidation(req, res, next) {
     const { auth } = req.headers;
+    console.log(auth);
     const token = auth?.replace("Bearer ", "");
 
     if (!token) {

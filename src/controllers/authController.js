@@ -25,7 +25,7 @@ async function signUp(req, res) {
 };
 
 async function signIn(req, res) {
-    const {email, password } = req.body;
+    const { email, password } = req.body;
     try {
         const user = await db.collection("users").findOne({ email });
         if (user && bcrypt.compareSync(password, user.password)) {
@@ -34,7 +34,8 @@ async function signIn(req, res) {
             const session = {
                 token,
                 userId: user._id,
-                name: user.name
+                name: user.name,
+                lastStatus: Date.now()
             };
 
             await db.collection("sessions").insertOne(session);
