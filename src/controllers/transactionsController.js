@@ -7,7 +7,7 @@ async function getTransactions (req, res) {
         const transactions = await db.collection("transactions").find({
             userId: session.userId
         }).toArray();
-        res.send(transactions);
+        res.status(201).send(transactions);
     } catch (error) {
         res.status(500).send(error.message);
     };

@@ -39,7 +39,7 @@ async function signIn(req, res) {
             };
 
             await db.collection("sessions").insertOne(session);
-            res.send(session);
+            res.status(201).send(session);
         } else {
             res.status(401).send("Usuário não encontrado, login ou senha incorretos");
         };
