@@ -52,4 +52,21 @@ async function createOutcomeTransactions (req, res) {
     };
 };
 
-export { getTransactions, createIncomeTransactions, createOutcomeTransactions };
+async function updateTransactions(req, res) {
+    const id = req.params.id;
+
+    try {
+        const transaction = res.locals.transaction;
+
+        await db.collection("transactions").updateOne({
+            _id: transaction._id
+            }, { $set:
+                req.body
+            });
+        res.sendStatus(201);
+    } catch (error) {
+        res.status(500).send(error.message);
+    };
+};
+
+export { getTransactions, createIncomeTransactions, createOutcomeTransactions, updateTransactions };
