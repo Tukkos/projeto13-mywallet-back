@@ -54,14 +54,18 @@ async function createOutcomeTransactions (req, res) {
 
 async function updateTransactions(req, res) {
     const id = req.params.id;
+    const { value, description, type } = req.body;
 
     try {
         const transaction = res.locals.transaction;
 
         await db.collection("transactions").updateOne({
             _id: transaction._id
-            }, { $set:
-                req.body
+            }, { $set: {
+                    value: value,
+                    description: description,
+                    type: type
+                }
             });
         res.sendStatus(201);
     } catch (error) {
